@@ -26,13 +26,14 @@ func ListTasks() {
 	}
 }
 
-func GetTask(name string) {
+func GetTask(name string) *Task {
 	for _, task := range tasks {
 		if strings.EqualFold(task.Name, name) {
 			fmt.Printf("Task found is %s\n", task.Name)
-			return
+			return &task
 		}
 	}
+	return nil
 }
 
 func DeleteTask(name string) {
@@ -43,39 +44,54 @@ func DeleteTask(name string) {
 		}
 	}
 }
-func main() {
 
+func Menu() {
 	fmt.Println("Welcome to the API")
+	fmt.Println("To add task add/a <task name>")
+	fmt.Println("To list a task list/l")
+	fmt.Println("to get a task get/g <task name>")
+	fmt.Println("to delete task delete/d <task name>")
+}
+func main() {
+	var input string
+	var arg string
+	var extra string
+	Menu()
 	for {
-		fmt.Println("Enter 1 for Add Task")
-		fmt.Println("Enter 2 for list Task")
-		fmt.Println("Enter 3 for get Task")
-		fmt.Println("Enter 4 for delete Task")
-		var choice int
-		fmt.Scanln(&choice)
+		fmt.Print("Enter command\n")
+		input = " "
+		arg = " "
+		extra = " "
+		fmt.Scanln(&input, &arg, &extra)
+		if extra != " " {
+			fmt.Println("enter a single word")
+		} else {
+			switch input {
+			case "add", "a":
+				AddTask(arg)
+			case "l", "list":
+				ListTasks()
+			case "get", "g":
+				GetTask(arg)
+			case "delete", "d":
+				DeleteTask(arg)
+			default:
+				fmt.Println("Enter a valid option")
 
-		switch choice {
-		case 1:
-			fmt.Println("Enter the name of the Task")
-			var name string
-			fmt.Scanln(&name)
-			AddTask(name)
-		case 2:
-			ListTasks()
-		case 3:
-			fmt.Println("enter name of the task")
-			var name string
-			fmt.Scanln(&name)
-			GetTask(name)
-		case 4:
-			fmt.Println("Enter name of task to get delted")
-			var name string
-			fmt.Scanln(&name)
-			DeleteTask(name)
+			}
 
-		default:
-			fmt.Println("Enter a valid option")
 		}
 	}
-
 }
+
+// operations supported
+// (add a) task-1
+// list l
+// delete d task-1
+// get g task-1
+
+// both not accepted
+// only one
+
+// go run main.go
+// infinit
