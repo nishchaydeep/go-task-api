@@ -1,17 +1,18 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
+
+	"github.com/nishchaydeep15/go-task-api/handler"
+	"github.com/nishchaydeep15/go-task-api/middleware"
 )
 
-type Task struct {
-	Name string `json:"name"`
-}
+// type Task struct {
+// 	Name string `json:"name"`
+// }
 
-var tasks []Task
+// var tasks []Task
 
 // func AddTask(name string) {
 // 	task := Task{Name: name}
@@ -47,50 +48,67 @@ var tasks []Task
 // 	}
 // }
 
-func AddTask(w http.ResponseWriter, r *http.Request) {
-	var task Task
-	err := json.NewDecoder(r.Body).Decode(&task)
-	if err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
-		return
-	}
-	tasks = append(tasks, task)
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"Message": "Task added"})
-}
+// func AddTask(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content Type", "Application/json")
+// 	var task Task
+// 	err := json.NewDecoder(r.Body).Decode(&task)
+// 	if err != nil {
+// 		http.Error(w, "Invalid input", http.StatusBadRequest)
+// 		return
+// 	}
+// 	tasks = append(tasks, task)
+// 	w.WriteHeader(http.StatusCreated)
+// 	json.NewEncoder(w).Encode(map[string]string{"Message": "Task added"})
+// }
 
-func ListTask(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(tasks)
-}
+// func ListTask(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content Type", "Application/json")
+// 	json.NewEncoder(w).Encode(tasks)
+// }
 
-func GetTask(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	for _, task := range tasks {
-		if strings.EqualFold(task.Name, name) {
-			json.NewEncoder(w).Encode(task)
-			return
-		}
-	}
-}
+// func GetTask(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content Type", "Application/json")
+// 	name := r.URL.Query().Get("name")
+// 	for _, task := range tasks {
+// 		if strings.EqualFold(task.Name, name) {
+// 			json.NewEncoder(w).Encode(task)
+// 			return
+// 		}
+// 	}
+// }
 
-func DeleteTask(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	for index, task := range tasks {
-		if strings.EqualFold(task.Name, name) {
-			tasks = append(tasks[:index], tasks[index+1:]...)
-			json.NewEncoder(w).Encode(map[string]string{"message": "Task Deleted"})
-			return
-		}
-	}
-}
+//	func DeleteTask(w http.ResponseWriter, r *http.Request) {
+//		w.Header().Set("Content Type", "Application/json")
+//		w.Header().Set("Content ")
+//		name := r.URL.Query().Get("name")
+//		for index, task := range tasks {
+//			if strings.EqualFold(task.Name, name) {
+//				tasks = append(tasks[:index], tasks[index+1:]...)
+//				json.NewEncoder(w).Encode(map[string]string{"message": "Task Deleted"})
+//				return
+//			}
+//		}
+//	}
+
 func main() {
 	fmt.Println("Welcome to the API")
-	http.HandleFunc("/get", GetTask)
-	http.HandleFunc("/list", ListTask)
-	http.HandleFunc("/post", AddTask)
-	http.HandleFunc("/delete", DeleteTask)
-
-	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			if name := r.URL.Query().Get("name"); name != "" {
+				handler.GetTask(w, r)
+			} else {
+				handler.ListTask(w, r)
+			}
+		case http.MethodPost:
+			handler.AddTask(w, r)
+		case http.MethodDelete:
+			handler.DeleteTask(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	http.ListenAndServe(":8070", middleware.LoggingMiddleware(http.DefaultServeMux))
 }
 
 // func main() {
