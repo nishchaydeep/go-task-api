@@ -6,6 +6,7 @@ import (
 
 	"github.com/nishchaydeep15/go-task-api/handler"
 	"github.com/nishchaydeep15/go-task-api/middleware"
+	"github.com/nishchaydeep15/go-task-api/storage"
 )
 
 // type Task struct {
@@ -92,6 +93,7 @@ import (
 
 func main() {
 	fmt.Println("Welcome to the API")
+	storage.LoadTasks()
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -108,6 +110,7 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+	// http.HandleFunc("/tasks/delete?name=", handler.DeleteTask)
 	http.ListenAndServe(":8070", middleware.LoggingMiddleware(http.DefaultServeMux))
 }
 

@@ -1,3 +1,3 @@
 module github.com/nishchaydeep15/go-task-api
 
-go 1.24.5
+go 1.21
