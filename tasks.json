@@ -1,1 +1,1 @@
-[{"name":"API Task"},{"name":"Sales Task"},{"name":"Finance Task"},{"name":"Digital Task"},{"name":"Bring Task"}]
+[{"name":"API Task","completed":false,"search":""},{"name":"Sales Task","completed":false,"search":""},{"name":"Finance Task","completed":false,"search":""},{"name":"Digital Task","completed":false,"search":""},{"name":"Bring Task","completed":false,"search":""},{"name":"Buying Task","completed":false,"search":""},{"name":"Selling Task","completed":true,"search":""},{"name":"Lifting Task","completed":true,"search":"meeting"}]
