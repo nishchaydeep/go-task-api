@@ -111,14 +111,14 @@ func init() {
 
 func main() {
 	fmt.Println("Welcome to the API")
+	var category string
+	fmt.Print("Enter category to email: ")
+	fmt.Scanln(&category)
 	storage.LoadTasks()
 	tasks, err := storage.LoadTasks()
 	if err != nil {
 		fmt.Println("Error loading tasks:", err)
 	} else {
-		var category string
-		fmt.Print("Enter category to email: ")
-		fmt.Scanln(&category)
 		jobs.EmailSender(category, &tasks)
 
 	}

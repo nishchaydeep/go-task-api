@@ -12,7 +12,7 @@ import (
 )
 
 func EmailSender(category string, tasks *[]model.Task) {
-	log.Println("Background Job: Sending Email for category:", category)
+	fmt.Println("Background Job: Sending Email for category:", category)
 
 	// Filter tasks by category
 	filtered := []model.Task{}
@@ -37,7 +37,7 @@ func EmailSender(category string, tasks *[]model.Task) {
 		body += fmt.Sprintf("Accessed At: %s\n", task.AccessesAt.Format(time.RFC1123))
 		body += fmt.Sprintf("Description: %s\n", task.Description)
 		body += fmt.Sprintf("Category   : %s\n", task.Category)
-		body += "----------------------------------------\n"
+		body += "\n"
 	}
 
 	from := os.Getenv("SMTP_EMAIL")
