@@ -1,13 +1,10 @@
 
-
-````markdown
 # Go Task API
 
 A simple task management API written in Go.
 
 ---
 
-## How to Run
 
 ### Running Locally (with Go)
 
