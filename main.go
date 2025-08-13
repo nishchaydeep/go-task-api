@@ -1,13 +1,31 @@
+// @title Go Task API
+// @version 1.0
+// @description A simple API for managing tasks with categories and email notifications.
+// @host localhost:8070
+// @BasePath /tasks
+// @schemes http
+// @contact.name Nishchay Deep
+
 package main
 
 import (
 	"fmt"
 	"net/http"
 
+	_ "github.com/nishchaydeep15/go-task-api/docs" // Import generated docs
+
+	"github.com/joho/godotenv"
 	"github.com/nishchaydeep15/go-task-api/handler"
+	"github.com/nishchaydeep15/go-task-api/jobs"
 	"github.com/nishchaydeep15/go-task-api/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	"github.com/nishchaydeep15/go-task-api/storage"
 )
+
+func init() {
+	godotenv.Load()
+}
 
 // type Task struct {
 // 	Name string `json:"name"`
@@ -94,6 +112,17 @@ import (
 func main() {
 	fmt.Println("Welcome to the API")
 	storage.LoadTasks()
+	tasks, err := storage.LoadTasks()
+	if err != nil {
+		fmt.Println("Error loading tasks:", err)
+	} else {
+		var category string
+		fmt.Print("Enter category to email: ")
+		fmt.Scanln(&category)
+		jobs.EmailSender(category, &tasks)
+
+	}
+	fmt.Println("Server started on port 8070")
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -110,8 +139,11 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+
 	// http.HandleFunc("/tasks/delete?name=", handler.DeleteTask)
 	http.ListenAndServe(":8070", middleware.LoggingMiddleware(http.DefaultServeMux))
+
 }
 
 // func main() {

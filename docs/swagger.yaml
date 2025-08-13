@@ -1,0 +1,12 @@
+basePath: /tasks
+host: localhost:8070
+info:
+  contact:
+    name: Nishchay Deep
+  description: A simple API for managing tasks with categories and email notifications.
+  title: Go Task API
+  version: "1.0"
+paths: {}
+schemes:
+- http
+swagger: "2.0"

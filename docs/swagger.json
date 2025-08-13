@@ -1,0 +1,17 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "A simple API for managing tasks with categories and email notifications.",
+        "title": "Go Task API",
+        "contact": {
+            "name": "Nishchay Deep"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8070",
+    "basePath": "/tasks",
+    "paths": {}
+}
