@@ -1,17 +1,15 @@
+# Go Task API
 
-```markdown
-# 📌 Go Task API
-
-A simple and extensible **Task Management REST API** built with **Go**
+A simple and extensible **Task Management REST API** built with **Go**.
 
 ---
 
-## 🚀 How to Run the Project
+##  How to Run the Project
 
 ### Prerequisites
 
-* Go 1.23+ installed
-* `.env` file configured for SMTP 
+- Go 1.23+ installed
+- `.env` file configured for SMTP
 
 ---
 
@@ -26,7 +24,7 @@ The server starts on:
 
 ---
 
-### 🐳 Running with Docker (via Rancher Desktop / nerdctl)
+### Running with Docker (via Rancher Desktop / nerdctl)
 
 **1. Build the image:**
 
@@ -42,7 +40,20 @@ nerdctl run -p 8070:8070 --env-file .env go-task-api
 
 ---
 
-## 📨 Email Configuration (`.env`)
+## Environment Variables 
+
+| Key             | Description                         |
+| --------------- | ----------------------------------- |
+| `CATEGORY`      | Task category to filter and email   |
+| `SMTP_EMAIL`    | Email address used to send the mail |
+| `SMTP_PASSWORD` | SMTP auth password or app password  |
+| `SMTP_TO`       | Recipient email address             |
+| `SMTP_HOST`     | e.g., smtp.gmail.com                |
+| `SMTP_PORT`     | Usually 587 (TLS)                   |
+
+---
+
+## Email Configuration (`.env`)
 
 Create a `.env` file in your root directory with:
 
@@ -60,9 +71,9 @@ SMTP_PORT=587
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
-### ➕ Add Task
+### Add Task
 
 ```http
 POST /tasks
@@ -85,7 +96,7 @@ POST /tasks
 
 ---
 
-### 📋 List All Tasks
+### List All Tasks
 
 ```http
 GET /tasks
@@ -93,7 +104,7 @@ GET /tasks
 
 ---
 
-### 🔍 Get Task by Name
+### Get Task by Name
 
 ```http
 GET /tasks?name=Required Task
@@ -101,7 +112,7 @@ GET /tasks?name=Required Task
 
 ---
 
-### ❌ Delete Task by Name
+### Delete Task by Name
 
 ```http
 DELETE /tasks?name=Required Task
@@ -109,20 +120,7 @@ DELETE /tasks?name=Required Task
 
 ---
 
-## 🔧 Environment Variables 
-
-| Key             | Description                         |
-| --------------- | ----------------------------------- |
-| `CATEGORY`      | Task category to filter and email   |
-| `SMTP_EMAIL`    | Email address used to send the mail |
-| `SMTP_PASSWORD` | SMTP auth password or app password  |
-| `SMTP_TO`       | Recipient email address             |
-| `SMTP_HOST`     | e.g., smtp.gmail.com                |
-| `SMTP_PORT`     | Usually 587 (TLS)                   |
-
----
-
-## 📘 API Documentation (Swagger - Optional)
+## API Documentation (Swagger - Optional)
 
 If using `swaggo`:
 
@@ -147,8 +145,5 @@ If using `swaggo`:
 
 Made by [Nishchay Deep](https://github.com/nishchaydeep15) 
 
-```
-
----
 
 ```
