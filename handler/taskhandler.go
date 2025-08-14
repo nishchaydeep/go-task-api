@@ -1,45 +1,3 @@
-// AddTASK API
-// @Summary Add a new task
-// @Description Add a new task with name, category, and other details
-// @Tags tasks
-// @Accept json
-// @Produce json
-// @Param task body model.Task true "Task object"
-// @Success 201 {object} map[string]string "Task added successfully"
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Router /tasks [post]
-//GetTask API
-// @Summary Get a task by name
-// @Description Retrieve a task by its name
-// @Tags tasks
-// @Accept json
-// @Produce json
-// @Param name query string true "Task name"
-// @Success 200 {object} model.Task "Task found"
-// @Failure 404 {object} map[string]string "Task not found"
-// @Router /tasks [get]
-// ListTask API
-// @Summary List all tasks
-// @Description Retrieve a list of all tasks with optional filters
-// @Tags tasks
-// @Accept json
-// @Produce json
-// @Param completed query string false "Filter by completion status (true/false)"
-// @Param search query string false "Search tasks by name or description"
-// @Param category query string false "Filter by task category"
-// @Success 200 {array} model.Task "List of tasks"
-// @Router /tasks [get]
-// DeleteTask API
-// @Summary Delete a task by name
-// @Description Delete a task by its name
-// @Tags tasks
-// @Accept json
-// @Produce json
-// @Param name query string true "Task name"
-// @Success 200 {object} map[string]string "Task deleted successfully"
-// @Failure 404 {object} map[string]string "Task not found"
-// @Router /tasks [delete]
-
 package handler
 
 import (
@@ -67,6 +25,16 @@ func init() {
 	}
 }
 
+// AddTASK API
+// @Summary Add a new task
+// @Description Add a new task with name, category, and other details
+// @Tags tasks
+// @Accept json
+// @Produce json
+// @Param task body model.Task true "Task object"
+// @Success 201 {object} map[string]string "Task added successfully"
+// @Failure 400 {object} map[string]string "Invalid input"
+// @Router /tasks [post]
 func AddTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "Application/json")
 	var task model.Task
@@ -93,24 +61,26 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"Message": "Task added"})
 }
 
+// ListTask API
+// @Summary List all tasks
+// @Description Retrieve a list of all tasks with optional filters
+// @Tags tasks
+// @Accept json
+// @Produce json
+// @Param completed query string false "Filter by completion status (true/false)"
+// @Param search query string false "Search tasks by name or description"
+// @Param category query string false "Filter by task category"
+// @Success 200 {array} model.Task "List of tasks"
+// @Router /tasks/list [get]
 func ListTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "Application/json")
 
 	completed := r.URL.Query().Get("completed")
 	search := strings.TrimSpace(r.URL.Query().Get("search"))
 	category := strings.TrimSpace(r.URL.Query().Get("category"))
-	// fmt.Println("Search query:", search)
+
 	mutex.Lock()
 	defer mutex.Unlock()
-
-	// var filteredTasks []model.Task
-	// for _, task := range tasks {
-	// 	// fmt.Println("Checking task:", task.Name)
-	// 	if (completed == "" || (completed == "true" && task.Completed) || (completed == "false" && !task.Completed)) &&
-	// 		(search == "" || strings.Contains(strings.ToLower(task.Search), strings.ToLower(search))) {
-	// 		filteredTasks = append(filteredTasks, task)
-	// 	}
-	// }
 
 	filtered := tasks
 	if completed != "" {
@@ -146,6 +116,16 @@ func ListTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(filtered)
 }
 
+// GetTask API
+// @Summary Get a task by name
+// @Description Retrieve a task by its name
+// @Tags tasks
+// @Accept json
+// @Produce json
+// @Param name query string true "Task name"
+// @Success 200 {object} model.Task "Task found"
+// @Failure 404 {object} map[string]string "Task not found"
+// @Router /tasks [get]
 func GetTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "Application/json")
 	name := r.URL.Query().Get("name")
@@ -163,6 +143,17 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+// DeleteTask API
+// @Summary Delete a task by name
+// @Description Delete a task by its name
+// @Tags tasks
+// @Accept json
+// @Produce json
+// @Param name query string true "Task name"
+// @Success 200 {object} map[string]string "Task deleted successfully"
+// @Failure 404 {object} map[string]string "Task not found"
+// @Router /tasks [delete]
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	if name == "" {

@@ -2,7 +2,7 @@
 // @version 1.0
 // @description A simple API for managing tasks with categories and email notifications.
 // @host localhost:8070
-// @BasePath /tasks
+// @BasePath /
 // @schemes http
 // @contact.name Nishchay Deep
 
@@ -20,9 +20,8 @@ import (
 	"github.com/nishchaydeep15/go-task-api/handler"
 	"github.com/nishchaydeep15/go-task-api/jobs"
 	"github.com/nishchaydeep15/go-task-api/middleware"
-	httpSwagger "github.com/swaggo/http-swagger"
-
 	"github.com/nishchaydeep15/go-task-api/storage"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func init() {
@@ -132,7 +131,7 @@ func main() {
 			if name := r.URL.Query().Get("name"); name != "" {
 				handler.GetTask(w, r)
 			} else {
-				handler.ListTask(w, r)
+				// handler.ListTask(w, r)
 			}
 		case http.MethodPost:
 			handler.AddTask(w, r)
@@ -142,6 +141,8 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+	http.HandleFunc("/tasks/list", handler.ListTask)
+
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
 	// http.HandleFunc("/tasks/delete?name=", handler.DeleteTask)

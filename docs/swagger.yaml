@@ -1,4 +1,24 @@
-basePath: /tasks
+basePath: /
+definitions:
+  model.Task:
+    properties:
+      accessed_at:
+        type: string
+      category:
+        type: string
+      completed:
+        type: boolean
+      created_at:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      search:
+        type: string
+      updated_at:
+        type: string
+    type: object
 host: localhost:8070
 info:
   contact:
@@ -6,7 +26,121 @@ info:
   description: A simple API for managing tasks with categories and email notifications.
   title: Go Task API
   version: "1.0"
-paths: {}
+paths:
+  /tasks:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a task by its name
+      parameters:
+      - description: Task name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Task not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a task by name
+      tags:
+      - tasks
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a task by its name
+      parameters:
+      - description: Task name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task found
+          schema:
+            $ref: '#/definitions/model.Task'
+        "404":
+          description: Task not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a task by name
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: Add a new task with name, category, and other details
+      parameters:
+      - description: Task object
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Task added successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a new task
+      tags:
+      - tasks
+  /tasks/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all tasks with optional filters
+      parameters:
+      - description: Filter by completion status (true/false)
+        in: query
+        name: completed
+        type: string
+      - description: Search tasks by name or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by task category
+        in: query
+        name: category
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of tasks
+          schema:
+            items:
+              $ref: '#/definitions/model.Task'
+            type: array
+      summary: List all tasks
+      tags:
+      - tasks
 schemes:
 - http
 swagger: "2.0"
