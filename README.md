@@ -35,7 +35,7 @@ nerdctl build -f Dockerfile -t go-task-api .
 **2. Run the container:**
 
 ```bash
-nerdctl run -p 8070:8070 --env-file .env go-task-api
+nerdctl run -p 8070:8070 -e CATEGORY=work go-task-api
 ```
 
 ---
@@ -58,7 +58,7 @@ nerdctl run -p 8070:8070 --env-file .env go-task-api
 Create a `.env` file in your root directory with:
 
 ```env
-CATEGORY=work
+CATEGORY=work (eg taken over here)
 SMTP_EMAIL=your@email.com
 SMTP_PASSWORD=your_app_password
 SMTP_TO=recipient@email.com
