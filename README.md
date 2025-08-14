@@ -20,7 +20,7 @@ go run main.go
 ```
 
 The server starts on:
-📍 **[http://localhost:8070](http://localhost:8070)**
+**[http://localhost:8070/tasks](http://localhost:8070/tasks)**
 
 ---
 
