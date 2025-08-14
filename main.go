@@ -10,7 +10,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/nishchaydeep15/go-task-api/docs" // Import generated docs
 
@@ -111,16 +113,17 @@ func init() {
 
 func main() {
 	fmt.Println("Welcome to the API")
-	var category string
-	fmt.Print("Enter category to email: ")
-	fmt.Scanln(&category)
 	storage.LoadTasks()
-	tasks, err := storage.LoadTasks()
-	if err != nil {
-		fmt.Println("Error loading tasks:", err)
+	category := os.Getenv("CATEGORY")
+	if category == "" {
+		log.Println("CATEGORY env variable not set.")
 	} else {
-		jobs.EmailSender(category, &tasks)
-
+		tasks, err := storage.LoadTasks()
+		if err != nil {
+			log.Println("Error loading tasks:", err)
+		} else {
+			jobs.EmailSender(category, &tasks)
+		}
 	}
 	fmt.Println("Server started on port 8070")
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
