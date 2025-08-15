@@ -137,7 +137,7 @@ If using `swaggo`:
    ```
 
 3. Access Swagger UI:
-   📍 `http://localhost:8070/swagger/index.html`
+   `http://localhost:8070/swagger/index.html`
 
 
 
