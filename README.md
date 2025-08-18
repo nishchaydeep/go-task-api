@@ -35,7 +35,7 @@ nerdctl build -f Dockerfile -t go-task-api .
 **2. Run the container:**
 
 ```bash
-nerdctl run -p 8070:8070 -e CATEGORY=work go-task-api
+nerdctl run -p 8070:8070 go-task-api
 ```
 
 ---
@@ -109,10 +109,10 @@ GET /task?name=Required Task
 
 ---
 
-### Get Task by Category
+### Get Task by any other Field
 
 ```http
-GET /tasks?category=Required category
+GET /tasks?Field=Required category
 ```
 
 ---
