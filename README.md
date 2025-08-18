@@ -113,7 +113,7 @@ Field Name can be description, category, name, important, completed
 DELETE /task?name=Required Task
 ```
 
-## API Documentation (Swagger - Optional)
+## API Documentation (Swagger)
 
 If using `swaggo`:
 
