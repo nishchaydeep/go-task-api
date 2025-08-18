@@ -109,6 +109,14 @@ GET /task?name=Required Task
 
 ---
 
+### Get Task by Category
+
+```http
+GET /tasks?category=Required category
+```
+
+---
+
 ### Delete Task by Name
 
 ```http
