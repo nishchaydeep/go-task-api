@@ -32,20 +32,11 @@ func groupTasksByField(tasks []model.Task, fieldName string) map[string][]model.
 		fieldVal := v.FieldByName(fieldName)
 
 		if !fieldVal.IsValid() {
-			log.Printf("Invalid field: %s\n", fieldName)
+			fmt.Printf("Invalid field: %s\n", fieldName)
 			continue
 		}
 
-		var key string
-		switch fieldVal.Kind() {
-		case reflect.String:
-			key = fieldVal.String()
-		case reflect.Bool:
-			key = fmt.Sprintf("%v", fieldVal.Bool())
-		default:
-			key = fmt.Sprintf("%v", fieldVal.Interface())
-		}
-
+		key := fmt.Sprintf("%v", fieldVal.Interface())
 		grouped[key] = append(grouped[key], task)
 	}
 	return grouped
@@ -54,7 +45,7 @@ func groupTasksByField(tasks []model.Task, fieldName string) map[string][]model.
 func sendGroupedEmails(groupBy string) {
 	loadedTasks, err := storage.LoadTasks()
 	if err != nil {
-		log.Println("Error loading tasks:", err)
+		fmt.Println("Error loading tasks:", err)
 		return
 	}
 	grouped := groupTasksByField(loadedTasks, groupBy)
@@ -94,7 +85,7 @@ func EmailSender(groupBy string, field string, tasks *[]model.Task) {
 
 	tmpl, err := template.New("email").Parse(emailTemplate)
 	if err != nil {
-		log.Println("Error parsing email template:", err)
+		fmt.Println("Error parsing email template:", err)
 		return
 	}
 

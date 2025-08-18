@@ -34,10 +34,10 @@ func main() {
 		fmt.Println("Error loading tasks:", err)
 	} else {
 		// jobs.StartEmailScheduler("Completed")
-		// jobs.StartEmailScheduler("Category")
+		jobs.StartEmailScheduler("Category")
 		// jobs.StartEmailScheduler("Name")
 		// jobs.StartEmailScheduler("Description")
-		jobs.StartEmailScheduler("Important")
+		// jobs.StartEmailScheduler("Important")
 	}
 	fmt.Println("Server started on port 8070")
 	http.HandleFunc("/task", func(w http.ResponseWriter, r *http.Request) {
@@ -55,10 +55,7 @@ func main() {
 		}
 	})
 	http.HandleFunc("/tasks/", handler.ListTask)
-
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
-
-	// http.HandleFunc("/tasks/delete?name=", handler.DeleteTask)
 	http.ListenAndServe(":8070", middleware.LoggingMiddleware(http.DefaultServeMux))
 
 }
