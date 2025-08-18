@@ -114,7 +114,9 @@ GET /task?name=Required Task
 ```http
 GET /tasks?Field Name=Required category
 ```
+
 Field Name can be description, category, name, important, completed
+
 ---
 
 ### Delete Task by Name
