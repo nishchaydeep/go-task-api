@@ -2,7 +2,6 @@
 
 A simple and extensible **Task Management REST API** built with **Go**.
 
----
 
 ##  How to Run the Project
 
@@ -11,7 +10,6 @@ A simple and extensible **Task Management REST API** built with **Go**.
 - Go 1.23+ installed
 - `.env` file configured for SMTP
 
----
 
 ### Running Locally with Go
 
@@ -21,8 +19,6 @@ go run main.go
 
 The server starts on:
 **[http://localhost:8070/tasks](http://localhost:8070/tasks)**
-
----
 
 ### Running with Docker (via Rancher Desktop / nerdctl)
 
@@ -38,7 +34,6 @@ nerdctl build -f Dockerfile -t go-task-api .
 nerdctl run -p 8070:8070 go-task-api
 ```
 
----
 
 ## Environment Variables 
 
@@ -49,8 +44,6 @@ nerdctl run -p 8070:8070 go-task-api
 | `SMTP_TO`       | Recipient email address             |
 | `SMTP_HOST`     | e.g., smtp.gmail.com                |
 | `SMTP_PORT`     | Usually 587 (TLS)                   |
-
----
 
 ## Email Configuration (`.env`)
 
@@ -66,7 +59,6 @@ SMTP_PORT=587
 
 * App sends an email on startup with the filtered task summary based on the attribute user wants.
 
----
 
 ## API Endpoints
 
@@ -91,7 +83,6 @@ POST /task
 }
 ```
 
----
 
 ### List All Tasks
 
@@ -99,7 +90,6 @@ POST /task
 GET /tasks
 ```
 
----
 
 ### Get Task by Name
 
@@ -107,7 +97,6 @@ GET /tasks
 GET /task?name=Required Task
 ```
 
----
 
 ### Get Task by any other Field
 
@@ -117,15 +106,12 @@ GET /tasks?Field Name=Required category
 
 Field Name can be description, category, name, important, completed
 
----
 
 ### Delete Task by Name
 
 ```http
 DELETE /task?name=Required Task
 ```
-
----
 
 ## API Documentation (Swagger - Optional)
 
