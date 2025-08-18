@@ -76,7 +76,7 @@ SMTP_PORT=587
 ### Add Task
 
 ```http
-POST /tasks
+POST /task
 ```
 
 **Body (JSON):**
@@ -107,7 +107,7 @@ GET /tasks
 ### Get Task by Name
 
 ```http
-GET /tasks?name=Required Task
+GET /task?name=Required Task
 ```
 
 ---
@@ -115,7 +115,7 @@ GET /tasks?name=Required Task
 ### Delete Task by Name
 
 ```http
-DELETE /tasks?name=Required Task
+DELETE /task?name=Required Task
 ```
 
 ---
