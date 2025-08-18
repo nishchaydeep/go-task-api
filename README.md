@@ -44,7 +44,6 @@ nerdctl run -p 8070:8070 -e CATEGORY=work go-task-api
 
 | Key             | Description                         |
 | --------------- | ----------------------------------- |
-| `CATEGORY`      | Task category to filter and email   |
 | `SMTP_EMAIL`    | Email address used to send the mail |
 | `SMTP_PASSWORD` | SMTP auth password or app password  |
 | `SMTP_TO`       | Recipient email address             |
@@ -58,7 +57,6 @@ nerdctl run -p 8070:8070 -e CATEGORY=work go-task-api
 Create a `.env` file in your root directory with:
 
 ```env
-CATEGORY=work (eg taken over here)
 SMTP_EMAIL=your@email.com
 SMTP_PASSWORD=your_app_password
 SMTP_TO=recipient@email.com
@@ -66,8 +64,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 ```
 
-* `CATEGORY` is the task category you want to filter and email.
-* App sends an email on startup with the filtered task summary.
+* App sends an email on startup with the filtered task summary based on the attribute user wants.
 
 ---
 
