@@ -82,12 +82,12 @@ POST /task
 {
         "name": "Finance Task",
         "completed": false,
-        "search": "fin",
         "created_at": "2025-08-12T14:16:45.294515+05:30",
         "updated_at": "2025-08-12T14:16:45.294515+05:30",
         "accessed_at": "2025-08-12T14:16:45.294515+05:30",
         "description": "handling finance tasks",
-        "category": "office"
+        "category": "office",
+        "important" : true
 }
 ```
 
