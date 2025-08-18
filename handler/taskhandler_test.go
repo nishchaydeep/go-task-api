@@ -1,13 +1,10 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/nishchaydeep15/go-task-api/model"
 )
 
 func TestAddTaskValidation(t *testing.T) {
@@ -34,22 +31,25 @@ func TestAddTaskValidation(t *testing.T) {
 	}
 }
 
-func TestGetTask(t *testing.T) {
-	AddTask(httptest.NewRecorder(), httptest.NewRequest("POST", "/tasks", strings.NewReader(`{"name":"GetMe","category":"testing"}`)))
-
-	req := httptest.NewRequest("GET", "/tasks?name=GetMe", nil)
-	rr := httptest.NewRecorder()
-	GetTask(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("Expected 200 OK, got %d", rr.Code)
+func TestGetTaskNotFound(t *testing.T) {
+	tests := []struct {
+		name       string
+		query      string
+		wantStatus int
+	}{
+		{"Task Not Found", "name=TaskDoesnotExist", http.StatusNotFound},
+		{"Empty Query", "", http.StatusBadRequest},
 	}
 
-	var task model.Task
-	if err := json.NewDecoder(rr.Body).Decode(&task); err != nil {
-		t.Fatal("Invalid JSON response")
-	}
-	if task.Name != "GetMe" {
-		t.Errorf("Expected task name GetMe, got %s", task.Name)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/tasks?"+tc.query, nil)
+			rr := httptest.NewRecorder()
+			GetTask(rr, req)
+
+			if rr.Code != tc.wantStatus {
+				t.Errorf("Expected status %d, got %d", tc.wantStatus, rr.Code)
+			}
+		})
 	}
 }

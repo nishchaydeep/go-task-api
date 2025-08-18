@@ -12,9 +12,9 @@ definitions:
         type: string
       description:
         type: string
+      important:
+        type: boolean
       name:
-        type: string
-      search:
         type: string
       updated_at:
         type: string
@@ -27,7 +27,7 @@ info:
   title: Go Task API
   version: "1.0"
 paths:
-  /tasks:
+  /task:
     delete:
       consumes:
       - application/json
@@ -111,7 +111,7 @@ paths:
       summary: Add a new task
       tags:
       - tasks
-  /tasks/list:
+  /tasks:
     get:
       consumes:
       - application/json

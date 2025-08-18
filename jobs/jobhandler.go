@@ -1,43 +1,113 @@
 package jobs
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"log"
 	"net/smtp"
 	"os"
-	"strings"
+	"reflect"
 	"time"
 
 	"github.com/nishchaydeep15/go-task-api/model"
+	"github.com/nishchaydeep15/go-task-api/storage"
 )
 
-func EmailSender(category string, tasks *[]model.Task) {
-	fmt.Println("Background Job: Sending Email for category:", category)
-
-	// Filter tasks by category
-	filtered := []model.Task{}
-	for _, task := range *tasks {
-		if strings.EqualFold(task.Category, category) {
-			filtered = append(filtered, task)
+func StartEmailScheduler(groupBy string) {
+	go func() {
+		ticker := time.NewTicker(15 * time.Second)
+		defer ticker.Stop()
+		for {
+			<-ticker.C
+			sendGroupedEmails(groupBy)
 		}
-	}
+	}()
+}
+func groupTasksByField(tasks []model.Task, fieldName string) map[string][]model.Task {
+	grouped := make(map[string][]model.Task)
 
-	if len(filtered) == 0 {
-		log.Println("No tasks found for category:", category)
+	for _, task := range tasks {
+		v := reflect.ValueOf(task)
+		fieldVal := v.FieldByName(fieldName)
+
+		if !fieldVal.IsValid() {
+			log.Printf("Invalid field: %s\n", fieldName)
+			continue
+		}
+
+		var key string
+		switch fieldVal.Kind() {
+		case reflect.String:
+			key = fieldVal.String()
+		case reflect.Bool:
+			key = fmt.Sprintf("%v", fieldVal.Bool())
+		default:
+			key = fmt.Sprintf("%v", fieldVal.Interface())
+		}
+
+		grouped[key] = append(grouped[key], task)
+	}
+	return grouped
+}
+
+func sendGroupedEmails(groupBy string) {
+	loadedTasks, err := storage.LoadTasks()
+	if err != nil {
+		log.Println("Error loading tasks:", err)
 		return
 	}
-	body := fmt.Sprintf("Email Content for category '%s':\n\n", category)
-	for i, task := range filtered {
-		body += fmt.Sprintf("Task no %d:\n", i+1)
-		body += fmt.Sprintf("Name       : %s\n", task.Name)
-		body += fmt.Sprintf("Completed  : %v\n", task.Completed)
-		body += fmt.Sprintf("Search     : %s\n", task.Search)
-		body += fmt.Sprintf("Created At : %s\n", task.CreatedAt.Format(time.RFC1123))
-		body += fmt.Sprintf("Updated At : %s\n", task.UpdatedAt.Format(time.RFC1123))
-		body += fmt.Sprintf("Accessed At: %s\n", task.AccessesAt.Format(time.RFC1123))
-		body += fmt.Sprintf("Description: %s\n", task.Description)
-		body += fmt.Sprintf("Category   : %s\n", task.Category)
-		body += "\n"
+	grouped := groupTasksByField(loadedTasks, groupBy)
+	for category, tasks := range grouped {
+		EmailSender(category, groupBy, &tasks)
+	}
+}
+
+const emailTemplate = `
+Email Content for {{.Field}} = '{{.GroupBy}}':
+
+{{range .Tasks}}
+Name       : {{.Name}}
+Completed  : {{.Completed}}
+Created At : {{.CreatedAt.Format "Mon, 06 April 2003 15:05:05 MST"}}
+Updated At : {{.UpdatedAt.Format "Mon, 06 April 2003 15:05:05 MST"}}
+Accessed At: {{.AccessesAt.Format "Mon, 06 April 2003 15:05:05 MST"}}
+Description: {{.Description}}
+Category   : {{.Category}}
+Important  : {{.Important}}
+
+{{end}}
+`
+
+func EmailSender(groupBy string, field string, tasks *[]model.Task) {
+	fmt.Printf("Sending Email for %s = %s\n", field, groupBy)
+	type emailData struct {
+		Field   string
+		GroupBy string
+		Tasks   []model.Task
+	}
+
+	if len(*tasks) == 0 {
+		fmt.Printf("No tasks found for %s = %s\n", field, groupBy)
+		return
+	}
+
+	tmpl, err := template.New("email").Parse(emailTemplate)
+	if err != nil {
+		log.Println("Error parsing email template:", err)
+		return
+	}
+
+	data := emailData{
+		Field:   field,
+		GroupBy: groupBy,
+		Tasks:   *tasks,
+	}
+
+	var body bytes.Buffer
+	if err := tmpl.Execute(&body, data); err != nil {
+		fmt.Println("Error executing email template:", err)
+		return
 	}
 
 	from := os.Getenv("SMTP_EMAIL")
@@ -47,21 +117,24 @@ func EmailSender(category string, tasks *[]model.Task) {
 	smtpPort := os.Getenv("SMTP_PORT")
 
 	if from == "" || password == "" || to == "" || smtpHost == "" || smtpPort == "" {
-		log.Println("SMTP credentials not set.")
+		fmt.Println("SMTP credentials not set.")
 		return
 	}
 
-	subject := fmt.Sprintf("Task Summary - %s", category)
-	message := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\n"+
-		"MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"utf-8\"\r\n\r\n%s",
-		from, to, subject, body)
+	subject := "Task Summary - " + field + ": " + groupBy
+	message := "From: " + from + "\r\n" +
+		"To: " + to + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"MIME-Version: 1.0\r\n" +
+		"Content-Type: text/plain; charset=\"utf-8\"\r\n\r\n" +
+		body.String()
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(message))
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(message))
 	if err != nil {
 		log.Println("Error sending email:", err)
 		return
 	}
+
 	fmt.Println("Email sent successfully")
 }

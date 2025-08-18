@@ -10,9 +10,7 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	_ "github.com/nishchaydeep15/go-task-api/docs"
 
@@ -31,25 +29,22 @@ func init() {
 func main() {
 	fmt.Println("Welcome to the API")
 	storage.LoadTasks()
-	category := os.Getenv("CATEGORY")
-	if category == "" {
-		log.Println("CATEGORY env variable not set.")
+	_, err := storage.LoadTasks()
+	if err != nil {
+		fmt.Println("Error loading tasks:", err)
 	} else {
-		tasks, err := storage.LoadTasks()
-		if err != nil {
-			log.Println("Error loading tasks:", err)
-		} else {
-			jobs.EmailSender(category, &tasks)
-		}
+		// jobs.StartEmailScheduler("Completed")
+		// jobs.StartEmailScheduler("Category")
+		// jobs.StartEmailScheduler("Name")
+		// jobs.StartEmailScheduler("Description")
+		jobs.StartEmailScheduler("Important")
 	}
 	fmt.Println("Server started on port 8070")
-	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/task", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			if name := r.URL.Query().Get("name"); name != "" {
 				handler.GetTask(w, r)
-			} else {
-				// handler.ListTask(w, r)
 			}
 		case http.MethodPost:
 			handler.AddTask(w, r)
@@ -59,7 +54,7 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
-	http.HandleFunc("/tasks/list", handler.ListTask)
+	http.HandleFunc("/tasks/", handler.ListTask)
 
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/nishchaydeep15/go-task-api/filter"
 	"github.com/nishchaydeep15/go-task-api/model"
 	"github.com/nishchaydeep15/go-task-api/storage"
 )
@@ -34,13 +35,14 @@ func init() {
 // @Param task body model.Task true "Task object"
 // @Success 201 {object} map[string]string "Task added successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
-// @Router /tasks [post]
+// @Router /task [post]
 func AddTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "Application/json")
 	var task model.Task
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		// http.Error(w, "Invalid input", http.StatusBadRequest)
+		http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	if strings.TrimSpace(task.Name) == "" {
@@ -71,49 +73,37 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 // @Param search query string false "Search tasks by name or description"
 // @Param category query string false "Filter by task category"
 // @Success 200 {array} model.Task "List of tasks"
-// @Router /tasks/list [get]
+// @Router /tasks [get]
 func ListTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "Application/json")
 
 	completed := r.URL.Query().Get("completed")
-	search := strings.TrimSpace(r.URL.Query().Get("search"))
 	category := strings.TrimSpace(r.URL.Query().Get("category"))
+	name := strings.TrimSpace(r.URL.Query().Get("name"))
+	description := strings.TrimSpace(r.URL.Query().Get("description"))
+	important := r.URL.Query().Get("important")
 
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	filtered := tasks
-	if completed != "" {
-		completedBool := completed == "true"
-		var temp []model.Task
-		for _, task := range filtered {
-			if task.Completed == completedBool {
-				temp = append(temp, task)
-			}
-		}
-		filtered = temp
-	}
-	if search != "" {
-		var temp []model.Task
-		for _, task := range filtered {
-			if strings.Contains(strings.ToLower(task.Search), strings.ToLower(search)) {
-				temp = append(temp, task)
-			}
-		}
-		filtered = temp
-	}
-
+	var filtered []filter.TaskFilter
 	if category != "" {
-		var temp []model.Task
-		for _, task := range filtered {
-			if strings.EqualFold(task.Category, category) {
-				temp = append(temp, task)
-			}
-		}
-		filtered = temp
+		filtered = append(filtered, filter.FieldFilter{Field: "category", Value: category})
 	}
-
-	json.NewEncoder(w).Encode(filtered)
+	if completed != "" {
+		filtered = append(filtered, filter.FieldFilter{Field: "completed", Value: completed})
+	}
+	if name != "" {
+		filtered = append(filtered, filter.FieldFilter{Field: "name", Value: name})
+	}
+	if description != "" {
+		filtered = append(filtered, filter.FieldFilter{Field: "description", Value: description})
+	}
+	if important != "" {
+		filtered = append(filtered, filter.FieldFilter{Field: "important", Value: important})
+	}
+	filters := filter.ApplyFilters(tasks, filtered...)
+	json.NewEncoder(w).Encode(filters)
 }
 
 // GetTask API
@@ -125,10 +115,14 @@ func ListTask(w http.ResponseWriter, r *http.Request) {
 // @Param name query string true "Task name"
 // @Success 200 {object} model.Task "Task found"
 // @Failure 404 {object} map[string]string "Task not found"
-// @Router /tasks [get]
+// @Router /task [get]
 func GetTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "Application/json")
 	name := r.URL.Query().Get("name")
+	if name == "" {
+		http.Error(w, "Task name is required", http.StatusBadRequest)
+		return
+	}
 
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -142,6 +136,7 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	http.Error(w, "Task not found", http.StatusNotFound)
 }
 
 // DeleteTask API
@@ -153,7 +148,7 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 // @Param name query string true "Task name"
 // @Success 200 {object} map[string]string "Task deleted successfully"
 // @Failure 404 {object} map[string]string "Task not found"
-// @Router /tasks [delete]
+// @Router /task [delete]
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	if name == "" {

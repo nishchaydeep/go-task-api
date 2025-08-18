@@ -17,7 +17,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/tasks": {
+        "/task": {
             "get": {
                 "description": "Retrieve a task by its name",
                 "consumes": [
@@ -144,7 +144,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/tasks/list": {
+        "/tasks": {
             "get": {
                 "description": "Retrieve a list of all tasks with optional filters",
                 "consumes": [
@@ -210,10 +210,10 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
+                "important": {
+                    "type": "boolean"
                 },
-                "search": {
+                "name": {
                     "type": "string"
                 },
                 "updated_at": {
