@@ -1,0 +1,15 @@
+{
+  "port": 8070,
+  "email_freq": "2s",
+  "storage": "file",
+   "task_file_path": "tasks.json",
+   "email_group_by": "Important",
+   "send_background_email": true,
+  "smtp": {
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "email": "ndeep7412@gmail.com",
+    "password": "yflsffkliwtnypou",
+    "to": "f20210929@hyderabad.bits-pilani.ac.in"
+  }
+}

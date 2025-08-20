@@ -5,9 +5,16 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/nishchaydeep15/go-task-api/storage"
 )
 
+func setupMemoryStore() {
+	storage.Store = storage.NewMemoryStore()
+}
+
 func TestAddTaskValidation(t *testing.T) {
+	setupMemoryStore()
 	tests := []struct {
 		name       string
 		payload    string

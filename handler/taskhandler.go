@@ -17,13 +17,10 @@ var (
 	mutex sync.Mutex
 )
 
-func init() {
-	loadedTasks, err := storage.LoadTasks()
-	if err == nil {
-		tasks = loadedTasks
-	} else {
-		tasks = []model.Task{} // Initialize with an empty slice if loading fails
-	}
+func InitializeTasks(loadedTasks []model.Task) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	tasks = loadedTasks
 }
 
 // AddTASK API
@@ -37,14 +34,13 @@ func init() {
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Router /task [post]
 func AddTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content Type", "Application/json")
+	w.Header().Set("Content-Type", "application/json")
 	var task model.Task
-	err := json.NewDecoder(r.Body).Decode(&task)
-	if err != nil {
-		// http.Error(w, "Invalid input", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	if strings.TrimSpace(task.Name) == "" {
 		http.Error(w, "Task name cannot be empty", http.StatusBadRequest)
 		return
@@ -55,12 +51,14 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 	task.UpdatedAt = now
 	task.AccessesAt = now
 
-	mutex.Lock()
-	tasks = append(tasks, task)
-	storage.SaveTasks(tasks)
-	mutex.Unlock()
+	err := storage.Store.Add(&task)
+	if err != nil {
+		http.Error(w, "Failed to add task: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	storage.Store.Update(&task)
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"Message": "Task added"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "Task added"})
 }
 
 // ListTask API
@@ -131,7 +129,7 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 		if strings.EqualFold(task.Name, name) {
 			task.AccessesAt = time.Now() // Update accessed_at time
 			task.UpdatedAt = task.AccessesAt
-			storage.SaveTasks(tasks) // Save updated task list
+			storage.Store.Update(&task) // Save updated task list
 			json.NewEncoder(w).Encode(task)
 			return
 		}
@@ -161,11 +159,12 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	for index, task := range tasks {
 		if strings.EqualFold(strings.TrimSpace(task.Name), strings.TrimSpace(name)) {
 			tasks = append(tasks[:index], tasks[index+1:]...)
-			storage.SaveTasks(tasks)
+			storage.Store.Delete(&task)
 			w.Header().Set("Content-Type", "Application/json")
 			json.NewEncoder(w).Encode(map[string]string{"message": "Task Deleted"})
 			return
 		}
 	}
+
 	http.Error(w, "Task not found", http.StatusNotFound)
 }
