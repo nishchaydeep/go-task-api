@@ -1,0 +1,24 @@
+name: Test Trailing Whitespace Hook
+
+# This file intentionally has trailing whitespace for testing   
+
+config:
+  port: 8080  
+  host: localhost   
+  
+database:
+  name: testdb 
+  user: admin    
+  password: secret  
+
+features:
+  - feature1   
+  - feature2  
+  - feature3     
+
+settings:
+  debug: true  
+  verbose: false   
+  
+# End of file with trailing spaces    
+
