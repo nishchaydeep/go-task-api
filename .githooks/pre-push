@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Pre-push hook to check for trailing whitespace in commits being pushed
+
+echo "Checking for trailing whitespace before push..."
+
+# Get the range of commits being pushed
+while read local_ref local_sha remote_ref remote_sha
+do
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        # Branch is being deleted, skip checks
+        exit 0
+    fi
+
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch, check against empty tree
+        range="4b825dc642cb6eb9a060e54bf8d69288fbee4904..$local_sha"
+    else
+        # Existing branch, check new commits
+        range="$remote_sha..$local_sha"
+    fi
+
+    # Check for trailing whitespace in .go, .yml, .yaml files
+    WHITESPACE_ERRORS=$(git diff "$range" --check 2>&1)
+
+    if echo "$WHITESPACE_ERRORS" | grep -qE '\.(go|yml|yaml):[0-9]+:.*trailing whitespace'; then
+        echo "Trailing whitespace found in commits being pushed:"
+        echo "$WHITESPACE_ERRORS" | grep -E '\.(go|yml|yaml):'
+        echo ""
+        echo "Please fix trailing whitespace before pushing."
+        exit 1
+    fi
+done
+
+echo "No trailing whitespace found. Push allowed."
+exit 0
+

@@ -10,6 +10,26 @@ A simple and extensible **Task Management REST API** built with **Go**.
 - Go 1.23+ installed
 - `.env` file configured for SMTP
 
+## 🛡️ Automatic Code Quality Enforcement
+
+**No setup required!** This repository automatically enforces code quality standards via GitHub Actions.
+
+### What's Enforced Automatically:
+- ✅ No trailing whitespace in `.go`, `.yml`, `.yaml` files
+- ✅ Runs on every push and pull request
+- ✅ Cannot be bypassed by developers
+- ✅ Blocks merges if checks fail
+
+### Optional: Faster Local Feedback
+
+Want to catch issues **before** pushing? Run this once:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This enables local pre-push checks for instant feedback (optional but recommended).
+
 
 ### Running Locally with Go
 
